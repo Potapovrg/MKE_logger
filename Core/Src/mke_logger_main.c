@@ -18,10 +18,17 @@ bufferSPI testbuf[4]={
 
 uint8_t Button1, Button2, Button3;
 
+exec_time_struct exec_time;
+
+uint32_t seconds;
+uint32_t miliseconds;
+
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 {
 	if(USBH_HID_GetDeviceType(phost) == HID_MOUSE)  // if the HID is Mouse
 		{
+			//exec_time=stop_exec_time();
+			miliseconds=TIM2->CNT;
 			HID_MOUSE_Info_TypeDef *Mouse_Info;
 			Mouse_Info = USBH_HID_GetMouseInfo(phost);  // Get the info
 			int X_Val = Mouse_Info->x;  // get the x value
@@ -30,8 +37,9 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 			if (Y_Val > 127) Y_Val -= 255;
 
 
-			int len = sprintf (Uart_Buf, "X=%d, Y=%d, Button1=%d, Button2=%d, Button3=%d\n", X_Val, Y_Val, \
-					                                Mouse_Info->buttons[0],Mouse_Info->buttons[1], Mouse_Info->buttons[2]);
+			int len = sprintf (Uart_Buf, "X=%d, Y=%d, Button1=%d, Button2=%d, Button3=%d, Time_TIM=%d.%04d s\r\n\0", X_Val, Y_Val, \
+					                                Mouse_Info->buttons[0],Mouse_Info->buttons[1], Mouse_Info->buttons[2],seconds,miliseconds);
+			//int len = sprintf (Uart_Buf, "\r\n\0");
 			HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
 
 			spi_transmit_buffer.target=0b00001001;
@@ -53,13 +61,21 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost)
 			else spi_transmit_buffer.button=spi_transmit_buffer.button&0b11111011;
 
 
-			HAL_UART_Transmit(&huart1, (uint8_t *) Uart_Buf, len, 100);
+			//HAL_UART_Transmit(&huart1, (uint8_t *) &spi_transmit_buffer, sizeof(spi_transmit_buffer), 100);
+			HAL_UART_Transmit(&huart1, (uint8_t *) &Uart_Buf, len, 100);
 			HAL_GPIO_WritePin(CS_GPIO_Port,CS_Pin,GPIO_PIN_SET);
 			HAL_Delay(1);
-			HAL_SPI_TransmitReceive(&hspi1,&spi_transmit_buffer,&spi_receive_buffer,sizeof(spi_transmit_buffer),10);
+			HAL_SPI_TransmitReceive(&hspi1,(uint8_t *) &spi_transmit_buffer,(uint8_t *) &spi_receive_buffer,sizeof(spi_transmit_buffer),10);
 			HAL_GPIO_WritePin(CS_GPIO_Port,CS_Pin,GPIO_PIN_RESET);
+			//start_exec_time();
+			TIM2->CNT=0;
+			seconds=0;
 		}
 }
 
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	seconds++;
+	//HAL_GPIO_TogglePin(GPIOC,GPIO_PIN_13);
+}
 

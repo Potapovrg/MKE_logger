@@ -1,1 +1,2 @@
-mke_logger_main.c:21:6:USBH_HID_EventCallback	48	static
+mke_logger_main.c:26:6:USBH_HID_EventCallback	64	static
+mke_logger_main.c:76:6:HAL_TIM_PeriodElapsedCallback	16	static

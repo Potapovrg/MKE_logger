@@ -31,7 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "exec_time.h"
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -59,8 +59,8 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
-#define CS_Pin GPIO_PIN_4
-#define CS_GPIO_Port GPIOA
+#define CS_Pin GPIO_PIN_0
+#define CS_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

@@ -1,0 +1,4 @@
+exec_time.c:14:6:DWT_Init	4	static
+exec_time.c:20:6:start_exec_time	4	static
+exec_time.c:25:18:stop_exec_time	32	static
+exec_time.c:35:7:stop_exec_time_float	16	static
